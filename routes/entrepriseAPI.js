@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Entreprise = require('../models/entreprise');
+const PasswordReset = require('../models/passwordReset');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
+const nodemailer = require('nodemailer');
 
 // Méthose Get
 router.get('/', (req, res) => {
@@ -101,5 +103,57 @@ router.post('/login', (req, res) => {
         })
 });
 
+// forget password
+
+router.post('/password-forget', (req, res) => {
+    Entreprise.findOne({ email: req.body.email })
+        .then((entreprise) => {
+            if (entreprise) {
+
+                PasswordReset.create({
+                    email: req.body.email,
+                    token: Math.floor(Math.random() * 1000)
+                }).then((createdToken) =>{
+                    // email message options
+                    const mailOptions = {
+                        from: 'bentitataher@gmail.com',
+                        to: 'bentitataher@gmail.com',
+                        subject: 'Sent mail from mailApi',
+                        html: `Clickti this <a href="http://localhost:4200/#/password-reset/${createdToken.token}">link</a> to reset your password.` ,
+                    };
+                    // email transport configuration
+    
+                    var transport = nodemailer.createTransport({
+                        service: "gmail",
+                        secure: false,
+                        auth: {
+                            user: "bentitataher@gmail.com",
+                            pass: "@Taher1988"
+                        },
+                        tls: {
+                            rejectUnauthorized: false
+                        }
+                    });
+    
+                    // send email
+                    transport.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            res.send('error')
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.reponse);
+                            res.json({ message: "email send sucessfully" });
+                        }
+                    });
+
+                })
+
+
+            }
+            else {
+                console.log("Ce mail n'existe pas !");
+            }
+        })
+})
 
 module.exports = router;
