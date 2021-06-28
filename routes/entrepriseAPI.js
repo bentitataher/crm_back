@@ -156,23 +156,41 @@ router.post('/password-forget', (req, res) => {
 })
 
 // Reset password
-router.post('/password-reset', (req, res) =>{
-    PasswordReset.findOne({token : req.body.token})
-    .then((reset) =>{
-        if(reset){
+router.post('/password-reset', (req, res) => {
+    PasswordReset.findOne({ token: req.body.token })
+        .then((reset) => {
+            if (reset) {
 
-            Entreprise.findOneAndUpdate({email : reset.email}, req.body)
-                .then( ()=>{
-                    Entreprise.findOne({email : reset.email})
-                        .then((entreprise) =>{
-                            res.status(200).json({entreprise})
-                        })
-                })
-                
-        }else{
-            res.status(201).json({message : "Taken doesn't exists !"})
-        }
-    })
+
+                bcrypt.hash(req.body.password, 10, (err, hash) => {
+
+                    if (err) {
+                        return res.status(500).json({
+                            error: err
+                        });
+                    }
+
+                    else {
+                        req.body.password = hash;
+                        Entreprise.findOneAndUpdate({ email: reset.email }, req.body)
+                            .then(() => {
+                                Entreprise.findOne({ email: reset.email })
+                                    .then((entreprise) => {
+                                        res.status(200).json({ entreprise })
+                                    })
+                            })
+                    }
+                });
+
+
+
+
+
+
+            } else {
+                res.status(201).json({ message: "Taken doesn't exists !" })
+            }
+        })
 })
 
 
