@@ -113,16 +113,16 @@ router.post('/password-forget', (req, res) => {
                 PasswordReset.create({
                     email: req.body.email,
                     token: Math.floor(Math.random() * 1000)
-                }).then((createdToken) =>{
+                }).then((createdToken) => {
                     // email message options
                     const mailOptions = {
-                        from: 'bentitataher@gmail.com',
+                        from: req.body.email,
                         to: 'bentitataher@gmail.com',
-                        subject: 'Sent mail from mailApi',
-                        html: `Clickti this <a href="http://localhost:4200/#/password-reset/${createdToken.token}">link</a> to reset your password.` ,
+                        subject: 'Sent mail from mailApi with req.body.email',
+                        html: `Clickti this <a href="http://localhost:4200/#/password-reset/${createdToken.token}">link</a> to reset your password.`,
                     };
                     // email transport configuration
-    
+
                     var transport = nodemailer.createTransport({
                         service: "gmail",
                         secure: false,
@@ -134,7 +134,7 @@ router.post('/password-forget', (req, res) => {
                             rejectUnauthorized: false
                         }
                     });
-    
+
                     // send email
                     transport.sendMail(mailOptions, (error, info) => {
                         if (error) {
@@ -155,5 +155,25 @@ router.post('/password-forget', (req, res) => {
             }
         })
 })
+
+// Reset password
+router.post('/password-reset', (req, res) => {
+    PasswordReset.findOne({ token: req.body.token })
+        .then((reset) => {
+            if (reset) {
+
+                console.log(("reset password"));
+                res.status(203).json({ message: "reset password" })
+
+            } else {
+
+                console.log(("can't reset password"));
+                res.status(403).json({ message: "can't reset password" })
+
+            }
+        })
+});
+
+
 
 module.exports = router;
