@@ -104,7 +104,6 @@ router.post('/login', (req, res) => {
 });
 
 // forget password
-
 router.post('/password-forget', (req, res) => {
     Entreprise.findOne({ email: req.body.email })
         .then((entreprise) => {
@@ -157,22 +156,24 @@ router.post('/password-forget', (req, res) => {
 })
 
 // Reset password
-router.post('/password-reset', (req, res) => {
-    PasswordReset.findOne({ token: req.body.token })
-        .then((reset) => {
-            if (reset) {
+router.post('/password-reset', (req, res) =>{
+    PasswordReset.findOne({token : req.body.token})
+    .then((reset) =>{
+        if(reset){
 
-                console.log(("reset password"));
-                res.status(203).json({ message: "reset password" })
-
-            } else {
-
-                console.log(("can't reset password"));
-                res.status(403).json({ message: "can't reset password" })
-
-            }
-        })
-});
+            Entreprise.findOneAndUpdate({email : reset.email}, req.body)
+                .then( ()=>{
+                    Entreprise.findOne({email : reset.email})
+                        .then((entreprise) =>{
+                            res.status(200).json({entreprise})
+                        })
+                })
+                
+        }else{
+            res.status(201).json({message : "Taken doesn't exists !"})
+        }
+    })
+})
 
 
 
