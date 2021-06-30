@@ -6,6 +6,28 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const nodemailer = require('nodemailer');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) =>{
+        cb(null, 'uploads');
+    },
+    filename: (res, file, cb) =>{
+        const newFileName = Date.now() + path.extname(file.originalname);
+        cb(null, newFileName)
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
+        cb(null, true);
+    } else {
+        cb(null, false);
+    }
+}
+
+const upload = multer({ storage: storage, fileFilter : fileFilter})
 
 // Méthose Get
 router.get('/', (req, res) => {
@@ -50,7 +72,8 @@ router.post('/signup', function (req, res, next) {
 });
 
 // Compléter inscription
-router.put('/:id', function (req, res) {
+router.put('/:id', upload.single('image'),function (req, res) {
+    req.body.logo = req.file.path
     Entreprise.findByIdAndUpdate({ _id: req.params.id }, req.body)
         .then(function () {
             Entreprise.findOne({ _id: req.params.id })
@@ -182,17 +205,27 @@ router.post('/password-reset', (req, res) => {
                     }
                 });
 
-
-
-
-
-
             } else {
                 res.status(201).json({ message: "Taken doesn't exists !" })
             }
         })
 })
 
-
+// test-multer
+router.post('/test-multer', upload.single('image'), (req, res) =>{
+    req.body.logo = req.file.originalname
+    Entreprise.create(req.body)
+    .then((entreprise) =>{
+        console.log(
+            "====================",
+            "\n", Date(),
+            "\n====================",
+            "\n This is the mongo DB request ==>", entreprise,
+            "\n====================",
+            "\n", req.file
+        )
+        res.send(entreprise)
+    })
+})
 
 module.exports = router;
