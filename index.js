@@ -18,6 +18,7 @@ app.use(cors({ origin : 'http://localhost:4200' }));
 
 // initialisation des routes
 app.use('/entreprise', require('./routes/entrepriseAPI'));
+app.use('/admin-secteur', require('./routes/asminSecteurApi'));
 
 // listen for requests
 app.listen(3000, function(){
