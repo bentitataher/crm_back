@@ -29,10 +29,6 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage: storage, fileFilter : fileFilter})
 
-// Méthose Get
-router.get('/', (req, res) => {
-    res.send({ type: "Get request" })
-});
 
 // Méthode Post
 router.post('/', (req, res) => {
