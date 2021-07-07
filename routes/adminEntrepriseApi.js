@@ -73,4 +73,16 @@ router.post('/signup', upload.single('image'), function (req, res, next) {
     });
 });
 
+// Admin : Ajout entreprise
+router.put('/:id', upload.single('image'),function (req, res) {
+    req.body.logo = req.file.path
+    Entreprise.findByIdAndUpdate({ _id: req.params.id }, req.body)
+        .then(function () {
+            Entreprise.findOne({ _id: req.params.id })
+                .then(function (entreprise) {
+                    res.status(299).send(entreprise)
+                });
+        });
+});
+
 module.exports = router;
