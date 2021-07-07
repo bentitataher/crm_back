@@ -48,7 +48,8 @@ router.delete('/:id', (req, res) => {
 });
 
 // Admin : Ajouter entreprise
-router.post('/signup', function (req, res, next) {
+router.post('/signup', upload.single('image'), function (req, res, next) {
+    req.body.logo = req.file.path
     Entreprise.findOne({ email: req.body.email }).then(entreprise => {
         if (entreprise) {
 
