@@ -39,6 +39,14 @@ router.get('/', (req, res) => {
         })
 });
 
+// Admin : Méthode get one
+router.get('/:id', (req, res) =>{
+    Entreprise.findOne({_id: req.params.id})
+        .then((entreprise) =>{
+            res.status(200).json(entreprise);
+        })
+})
+
 // Admin : Méthose delete
 router.delete('/:id', (req, res) => {
     Entreprise.findByIdAndDelete({ _id: req.params.id })
@@ -75,7 +83,10 @@ router.post('/signup', upload.single('image'), function (req, res, next) {
 
 // Admin : Modification entreprise
 router.put('/:id', upload.single('image'), function (req, res) {
-    req.body.logo = req.file.path
+    
+    // req.body.logo = req.file.path
+    
+    
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         if (err) {
             return res.status(500).json({
