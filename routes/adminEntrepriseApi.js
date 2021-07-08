@@ -55,13 +55,13 @@ router.post('/signup', upload.single('image'), function (req, res, next) {
 
             return res.status(409).json({ message: 'Mail exist' });
 
-        }else {
+        } else {
             bcrypt.hash(req.body.password, 10, (err, hash) => {
                 if (err) {
                     return res.status(500).json({
                         error: err
                     });
-                }else {
+                } else {
                     req.body.password = hash;
                     Entreprise.create(req.body)
                         .then(function (entreprise) {
@@ -73,16 +73,29 @@ router.post('/signup', upload.single('image'), function (req, res, next) {
     });
 });
 
-// Admin : Ajout entreprise
-router.put('/:id', upload.single('image'),function (req, res) {
+// Admin : Modification entreprise
+router.put('/:id', upload.single('image'), function (req, res) {
     req.body.logo = req.file.path
-    Entreprise.findByIdAndUpdate({ _id: req.params.id }, req.body)
-        .then(function () {
-            Entreprise.findOne({ _id: req.params.id })
-                .then(function (entreprise) {
-                    res.status(299).send(entreprise)
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if (err) {
+            return res.status(500).json({
+                error: err
+            });
+        }
+        else {
+            req.body.password = hash;
+            Entreprise.findByIdAndUpdate({ _id: req.params.id }, req.body)
+                .then(function () {
+                    Entreprise.findOne({ _id: req.params.id })
+                        .then(function (entreprise) {
+                            res.status(299).send(entreprise)
+                        });
                 });
-        });
+        }
+    });
+
+
+
 });
 
 module.exports = router;
