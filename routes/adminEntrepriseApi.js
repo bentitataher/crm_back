@@ -84,7 +84,7 @@ router.post('/signup', upload.single('image'), function (req, res, next) {
 // Admin : Modification entreprise
 router.put('/:id', upload.single('image'), function (req, res) {
     
-    // req.body.logo = req.file.path
+    req.body.logo = req.file.path
     
     
     bcrypt.hash(req.body.password, 10, (err, hash) => {
